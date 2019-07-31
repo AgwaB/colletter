@@ -1,19 +1,44 @@
 language: java
 jdk:
-  - openjdk8
+- openjdk8
 
+services:
+  - docker
+sudo: true
+dist: trusty
 branches:
   only:
-    - master
-    - dev
-    - backend
+  - master
+  - dev
+  - backend
 
 cache:
   directories:
-    - '$HOME/.m2/repository'
-    - '$HOME/.gradle'
-
-script:
- - ./gradlew clean build
+  - "$HOME/.m2/repository"
+  - "$HOME/.gradle"
 
 before_script: cd backend
+
+jobs:
+  include:
+    - stage: test and build jar
+      script:
+        # "./gradlew clean build"
+    - stage: build docker image
+      script:
+        # - PRJ_GROUP=$(gradle properties -q | grep "group:" | awk '{print $2}')
+        # - PRJ_NAME=$(gradle properties -q | grep "name:" | awk '{print $2}')
+        # - PRJ_VERSION=$(gradle properties -q | grep "version:" | awk '{print $2}')
+        # - echo "## PROJECT_GROUP - ${PRJ_GROUP}"
+        # - echo "## PROJECT_NAME - ${PRJ_NAME}"
+        # - echo "## PROJECT_VERSION - ${PRJ_VERSION}"
+        # - PRJ_JAR=${PRJ_NAME}-${PRJ_VERSION}.jar
+        - echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin
+        - docker build -t ${PRJ_NAME}:${PRJ_VERSION} --build-arg JAR_FILE=build/libs/${PRJ_JAR} .
+        - docker tag ${PRJ_NAME}:${PRJ_VERSION} ${DOCKER_USER}/${PRJ_NAME}:latest
+        - docker push ${DOCKER_USER}/${PRJ_NAME}:latest
+
+env:
+  global:
+  - secure: Y85jqL1FB+d3hJOTxoLjdrxyUEhaZ1WHGgFWDBtfGYcFpJpWOaasj3/XkRO5kj5O6ogi883YWbMTqH1ZcbAluOsnJw011Xdx8J8671SaWtkcSt0m7xXRa5UHiWF41WzccmSwu/9KQ/5MYajF0OVWWof/EdJ9j/FfyQv206UHVY6LGZy+Ie/U+NGjwtTXLyotR9QuvXs5noXHs0XYCpcsfVFOOb+teM/fn1EL6eI9v8Ub8LW8r5w4qbduQp+ui4xteo39gI3ASa3CqDY3EDi6Y5h0Ynjm6wVGCi5IeLDU2VLl1ANIEwDDqM+o25ersCHmvQxr510IoyNqy5LetiLPIFxL868zSEOsXxSwfoGojVMsEgMYEqeVZht2ET/SvcFEsAl4hrx2hzOEWRWvXz9o+m0l1H5dkrwiCvcxR5B+sT0ikmBm0k0abMWwrOMrdj5SibF7ZJvu616Tqc/mJz6HCz+cvBsQXXGx4TPKcDpXvmUV50bD2WU6LT7S9TYian/q2rxrMotoAu45pfN/aJauUMbA4JQgAkOVZjgf0h+eYsjUjZWq53Vg9s/UuZ/LFVKtqVsRNJForT48jCRvmGD+E8hLxP3O9LVa9CZYlodkIJahOXhM+zWsrVvDZnLN/gYLdNKYjnc96J0ONhd27UXUuQ3gNSOdiU5m6jOtJph1rG8=
+  - secure: iOb8dLwyPsOa6IDMclGC8X0GJR4+JGQkM8uTVUoT+riXpvgkNb3Grw4mztmnC4BZFY0/6te369jlZY74U5Qfjlz0JXEFw1m+CbaEV9TuKdI/UA0sc1bfT090ZbpBdzKt0BRtKc3Ijg41NOgQdpMoThfVQb4rNy8fj3TRTgEwimjyJWG5EIKL0BJ36Gdi25pupDtguGAfoBIA+Z1/PwMGohGLJmqu+w17FZHL4yulTfm7TAAE7MqrI30X43Zy6Fu2rlr1DuvJmz93NtpcynZv+3odzkXgucziQJKV2qJEGnsG3oKLS+c6qzI6sF1JhQ40n9RnJJw9NSv3f8XaBblXOgPBgulEcqfUq4jzSS1BQ7tLfh48rOnFWkU4NJ+bYjACgGzHd21K6HT0HgECpoKNjfSAgn3bbOSsmncYynlytrHDx47x7xvrmBbIh5tuF0MS7lEfGEfOurDUifu9wWzVoX+duFwWsul6+92ysfHN3+WkzbsIgTJC63bJliyiFE+B5vkxPlf+4BQ8XmASZmZpujJnfVat3BcX2ZwiDEBvWadJJN2eKyZAsSeKF+GPFp2IuuiNhU0Dvyxo+6LP1whzGaCXgTj72m3L6+pgcxUQJJ9fE2Mqkgs+79/N+yWcRQPMVgs8erqpbfR+7dZX+v7IQL/0rz7+cwVHp+9vjPFL0j0=
