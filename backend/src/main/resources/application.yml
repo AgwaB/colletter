@@ -9,14 +9,14 @@ security:
 
 spring:
   profiles:
-    active: test
+    active: develop
 ---
 spring:
   profiles: develop
   datasource:
     develop:
       initialize: true
-      jdbc-url: jdbc:mysql://localhost:3306/colletter?serverTimezone=UTC&characterEncoding=UTF-8
+      jdbc-url: jdbc:mysql://colletter-mysql:3306/colletter?serverTimezone=UTC&characterEncoding=UTF-8
       username: root
       password: 1234
       driver-class-name: com.mysql.cj.jdbc.Driver
