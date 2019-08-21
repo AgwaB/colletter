@@ -45,7 +45,7 @@ public class CategoryService {
     public void deleteCategoryById(long categoryId) {
         categoryRepository.deleteById(categoryId);
     }
-
+  
     // TODO : 중복되는 조건?
     private boolean isRegistered(Category category) {
         if (categoryRepository.existsByName_enOrName_kr(category.getName_en(), category.getName_kr())) {
